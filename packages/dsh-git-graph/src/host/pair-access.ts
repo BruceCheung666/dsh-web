@@ -38,7 +38,12 @@ interface LookupCtx {
 export function isPairedOrLoopbackAllowed(ctx: LookupCtx, request: IncomingMessage): boolean {
   if (isLoopbackRequest(request)) return true
   const fromGet = typeof ctx.get === 'function' ? ctx.get('remoteWebUiPairing', false) : undefined
-  const pairing = (isPairingAccess(fromGet) ? fromGet : ctx.remoteWebUiPairing)
+  // The direct property is the bare-harness fallback only. A real cordis context
+  // exposes ctx.get and throws on a property it never injected, and
+  // dsh-host-webserver turns that throw into a bare 400 with an empty body
+  // before this route can answer its designed 403.
+  const direct = typeof ctx.get === 'function' ? undefined : ctx.remoteWebUiPairing
+  const pairing = isPairingAccess(fromGet) ? fromGet : (isPairingAccess(direct) ? direct : undefined)
   return pairing?.isPairedDevice(request) === true
 }
 

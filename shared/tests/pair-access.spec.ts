@@ -62,4 +62,19 @@ describe('isPairedOrLoopbackAllowed', () => {
       cookie: 'dsh_pair=dev-1',
     }))).toBe(true)
   })
+
+  it('refuses a non-loopback authority without reading an undeclared service property', () => {
+    // A real cordis context throws on a property it never injected, so the fence
+    // must ask ctx.get: that throw escapes the route handler and
+    // dsh-host-webserver answers a bare 400 instead of the designed 403.
+    const ctx = new Proxy({ get: () => undefined }, {
+      get: (target, prop, receiver) => {
+        if (prop in target) return Reflect.get(target, prop, receiver)
+        throw new Error(`cannot get property "${String(prop)}" without inject`)
+      },
+    })
+    const req = request({ remoteAddress: '192.168.1.20', host: 'dsh.example:443' })
+    expect(() => isPairedOrLoopbackAllowed(ctx as never, req)).not.toThrow()
+    expect(isPairedOrLoopbackAllowed(ctx as never, req)).toBe(false)
+  })
 })
