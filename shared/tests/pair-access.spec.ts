@@ -77,4 +77,36 @@ describe('isPairedOrLoopbackAllowed', () => {
     expect(() => isPairedOrLoopbackAllowed(ctx as never, req)).not.toThrow()
     expect(isPairedOrLoopbackAllowed(ctx as never, req)).toBe(false)
   })
+
+  it('admits a trusted non-loopback authority the host gate accepts', () => {
+    const ctx = { get: (name: string) => name === 'connection' ? { requestRejection: () => undefined } : undefined }
+    expect(isPairedOrLoopbackAllowed(ctx as never, request({
+      remoteAddress: '192.168.1.20',
+      host: 'dsh.example:443',
+    }))).toBe(true)
+  })
+
+  it('refuses an authority the host gate does not trust', () => {
+    const ctx = { get: (name: string) => name === 'connection' ? { requestRejection: () => 403 } : undefined }
+    expect(isPairedOrLoopbackAllowed(ctx as never, request({
+      remoteAddress: '192.168.1.20',
+      host: 'evil.example:443',
+    }))).toBe(false)
+  })
+
+  it('refuses a logged-out browser on a trusted authority', () => {
+    const ctx = { get: (name: string) => name === 'connection' ? { requestRejection: () => 401 } : undefined }
+    expect(isPairedOrLoopbackAllowed(ctx as never, request({
+      remoteAddress: '192.168.1.20',
+      host: 'dsh.example:443',
+    }))).toBe(false)
+  })
+
+  it('refuses when the host publishes no request gate', () => {
+    const ctx = { get: (name: string) => name === 'connection' ? {} : undefined }
+    expect(isPairedOrLoopbackAllowed(ctx as never, request({
+      remoteAddress: '192.168.1.20',
+      host: 'dsh.example:443',
+    }))).toBe(false)
+  })
 })
