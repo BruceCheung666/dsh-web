@@ -107,13 +107,16 @@ sidebar.
 
 ## Security model
 
-- Every `/api/dsh-skill-explorer/*` route is loopback-only by default (the
-  shared plugin-family fence: loopback socket + Host header + browser
-  same-origin markers): unpaired LAN clients get `403 forbidden: loopback-only`
-  before any skill-file access. When `dsh-remote-web-ui` is also loaded, a live
-  paired-device cookie is an additional allow path (the same cookie `api/gate`
-  already checks); unpaired and revoked devices stay 403. The skill center does
-  not depend on the remote plugin.
+- Every `/api/dsh-skill-explorer/*` route is gated by the shared plugin-family
+  fence (loopback socket + Host header + browser same-origin markers): a client
+  with no allow path gets `403 forbidden: loopback-only` before any skill-file
+  access. Beyond loopback there are two allow paths: a live paired-device cookie
+  when `dsh-remote-web-ui` is loaded (the same cookie `api/gate` already checks;
+  unpaired and revoked devices stay refused), and any request the host's own
+  gate admits — `connection.requestRejection`, an authority declared in
+  `trustedHosts` / `--trusted-host` with a logged-in browser — so an ingress or
+  tunnel deployment reaches the panel without pairing. The skill center does not
+  depend on the remote plugin.
 - Write routes accept the path displayed by the panel only as an identity claim;
   before mutating, a fresh filesystem scan must resolve the same skill name and
   exact path. Arbitrary paths and stale same-name fallbacks are rejected, so a

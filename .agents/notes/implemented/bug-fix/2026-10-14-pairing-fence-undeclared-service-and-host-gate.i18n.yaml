@@ -1,0 +1,5 @@
+# Bilingual-pair consistency record (docs/i18n.md): the git blob hash of each
+# side as of the last confirmed-consistent state. Both languages carry equal authority;
+# after editing either side, bring the other along and re-record with git hash-object.
+2026-10-14-pairing-fence-undeclared-service-and-host-gate.md: b5bdbdb214cec4bfdfec83e4c6cfbf51197e4ae5
+2026-10-14-pairing-fence-undeclared-service-and-host-gate.zh.md: 6f720d9f22521ba462c74121ef2d02ade3115a0d

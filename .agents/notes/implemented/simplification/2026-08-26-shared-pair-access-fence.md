@@ -16,7 +16,7 @@ A new shared runtime package imported as a dependency was rejected: every existi
 
 ## Consequences
 
-Fence fixes now propagate by editing one shared source and running `node scripts/sync-shared.mjs`; the drift gate (`test:scripts`) fails CI if any copy diverges. The sync-shared test's copy-count buckets grew (97 to 100 entries, 45 to 48 host copies) and its fake tree gained a pair-access source. No behavior change: identical logic, verified by the unchanged per-package specs.
+Fence fixes now propagate by editing one shared source and running `node scripts/sync-shared.mjs`; the drift gate (`test:scripts`) fails CI if any copy diverges. The sync-shared test's copy-count buckets grew (97 to 100 entries, 45 to 48 host copies) and its fake tree gained a pair-access source. No behavior change: identical logic, verified by the unchanged per-package specs. The fence's allow paths were later extended with the host's own request gate and its property read confined to contexts without `ctx.get` — see [pairing fence service lookup and host gate](../bug-fix/2026-10-14-pairing-fence-undeclared-service-and-host-gate.md).
 
 ## Testing
 

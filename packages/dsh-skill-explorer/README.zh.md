@@ -90,12 +90,13 @@ dsh plugin --profile web add link:$(pwd)/packages/dsh-skill-explorer
 
 ## 安全模型
 
-- 全部 `/api/dsh-skill-explorer/*` 路由默认仅限 loopback（插件家族共享围栏：
-  loopback 套接字 + Host 头 + 浏览器同源标记）：未配对的局域网客户端在任何
-  技能文件访问前即收到 `403 forbidden: loopback-only`。同时装了
-  `dsh-remote-web-ui` 时，有效的已配对设备 cookie 是额外放行路径（与
-  `api/gate` 检查同一枚 cookie）；未配对与已撤销设备仍 403。技能中心不硬依赖
-  远程插件。
+- 全部 `/api/dsh-skill-explorer/*` 路由由插件家族共享围栏把关（loopback 套接字 +
+  Host 头 + 浏览器同源标记）：没有任何放行路径的客户端在任何技能文件访问前即收到
+  `403 forbidden: loopback-only`。loopback 之外有两条放行路径：装了
+  `dsh-remote-web-ui` 时有效的已配对设备 cookie（与 `api/gate` 检查同一枚 cookie，
+  未配对与已撤销设备仍拒绝），以及宿主自己门禁 `connection.requestRejection` 放行的
+  请求——即在 `trustedHosts` / `--trusted-host` 中声明的域名加上已登录浏览器，因此
+  Ingress / 隧道部署无需配对即可打开面板。技能中心不硬依赖远程插件。
 - 写路由仅把面板展示的路径作为身份声明；执行修改前，最新文件系统扫描必须解析到
   同名且路径完全一致的技能。任意路径与过期的同名回退都会被拒绝，因此项目技能
   消失后，尚未执行的操作不会改到同名的用户级或自定义技能。read 路由走同一套

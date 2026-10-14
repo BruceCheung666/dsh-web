@@ -16,7 +16,7 @@ Status: implemented
 
 ## Consequences
 
-闸门修复现在只需改一份共享源码并运行 `node scripts/sync-shared.mjs`；任何副本分叉都会被漂移门禁（`test:scripts`）在 CI 拦下。sync-shared 测试的副本计数桶随之更新（总条目 97→100，host 副本 45→48），其临时目录假树新增 pair-access 源文件。无行为变化：逻辑相同，由各包未改动的规格验证。
+闸门修复现在只需改一份共享源码并运行 `node scripts/sync-shared.mjs`；任何副本分叉都会被漂移门禁（`test:scripts`）在 CI 拦下。sync-shared 测试的副本计数桶随之更新（总条目 97→100，host 副本 45→48），其临时目录假树新增 pair-access 源文件。无行为变化：逻辑相同，由各包未改动的规格验证。此后闸门的放行路径又增加了宿主自己的请求门禁，其属性读取收窄到不提供 `ctx.get` 的 context——见[配对闸门的服务查找与宿主门禁](../bug-fix/2026-10-14-pairing-fence-undeclared-service-and-host-gate.md)。
 
 ## Testing
 
